@@ -5,6 +5,11 @@ from game import Game
 pygame.init()
 dark_blue = (44, 44, 127)
 
+pygame.joystick.init()
+joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+
+
+
 screen = pygame.display.set_mode((300, 600))
 pygame.display.set_caption("Python Tetris")
 
@@ -14,6 +19,7 @@ game = Game()
 
 GAME_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(GAME_UPDATE, 200)
+
 
 while True:
     for event in pygame.event.get():
@@ -32,6 +38,17 @@ while True:
                 game.move_down()
             if event.key == pygame.K_UP and game.game_over == False:
                 game.rotate()
+
+        if event.type == pygame.JOYBUTTONDOWN:
+            if pygame.joystick.Joystick(0).get_button(0):
+                game.move_down()
+            elif pygame.joystick.Joystick(0).get_button(1):
+                game.move_right()
+            elif pygame.joystick.Joystick(0).get_button(2):
+                game.move_left()
+            elif pygame.joystick.Joystick(0).get_button(3):
+                game.rotate()
+
         if event.type == GAME_UPDATE and game.game_over == False:
             game.move_down()
 
