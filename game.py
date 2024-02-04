@@ -1,6 +1,7 @@
 from grid import Grid
 from blocks import *
 import random
+import pygame
 class Game:
     def __init__(self):
         self.grid = Grid()
@@ -8,6 +9,22 @@ class Game:
         self.current_block = self.get_random_block()
         self.next_block = self.get_random_block()
         self.game_over = False
+        self.score = 0
+        self.rotate_sound = pygame.mixer.Sound("Sounds/rotate.ogg")
+        self.clear_sound = pygame.mixer.Sound("Sounds/clear.ogg")
+
+        pygame.mixer.music.load("Sounds/music.ogg")
+        pygame.mixer.music.play(-1)
+
+    def update_score(self, lines_cleared, move_down_points):
+        if lines_cleared == 1:
+            self.score += 100
+        elif lines_cleared == 2:
+            self.score +=300
+        elif lines_cleared == 3:
+            self.score += 500
+        self.score += move_down_points
+
     def get_random_block(self):
         if len(self.blocks) == 0:
             self.blocks = [IBlock(), JBlock(), LBlock(), OBlock(), SBlock(), TBlock(), ZBlock()]
@@ -37,7 +54,10 @@ class Game:
             self.grid.grid[position.row][position.column] = self.current_block.id
         self.current_block = self.next_block
         self.next_block = self.get_random_block()
-        self.grid.clear_full_rows()
+        rows_cleared = self.grid.clear_full_rows()
+        if rows_cleared >0:
+            self.clear_sound.play()
+            self.update_score(rows_cleared, 0)
         if self.block_fits() == False:
             self.game_over = True
 
@@ -46,6 +66,8 @@ class Game:
         self.blocks = [IBlock(), JBlock(), LBlock(), OBlock(), SBlock(), TBlock(), ZBlock()]
         self.current_block = self.get_random_block()
         self.next_block = self.get_random_block()
+        self.score = 0
+
     def block_fits(self):
         tiles = self.current_block.get_cell_positions()
         for tile in tiles:
@@ -57,6 +79,8 @@ class Game:
         self.current_block.rotate()
         if self.block_inside() == False or self.block_fits() == False:
             self.current_block.undo_rotation()
+        else:
+            self.rotate_sound.play()
 
     def block_inside(self):
         tiles = self.current_block.get_cell_positions()
@@ -66,4 +90,11 @@ class Game:
         return True
     def draw(self, screen):
         self.grid.draw(screen)
-        self.current_block.draw(screen)
+        self.current_block.draw(screen, 11, 11)
+
+        if self.next_block.id == 3:
+            self.next_block.draw(screen, 255, 290)
+        elif self.next_block.id == 4:
+            self.next_block.draw(screen, 255, 280)
+        else:
+            self.next_block.draw(screen, 270, 270)
