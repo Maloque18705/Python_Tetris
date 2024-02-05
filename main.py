@@ -28,7 +28,7 @@ clock = pygame.time.Clock()
 game = Game()
 
 GAME_UPDATE = pygame.USEREVENT
-pygame.time.set_timer(GAME_UPDATE, 200)
+pygame.time.set_timer(GAME_UPDATE, 400)
 
 
 while True:
@@ -49,6 +49,23 @@ while True:
                 game.update_score(0,1)
             if event.key == pygame.K_UP and game.game_over == False:
                 game.rotate()
+
+        keys = pygame.key.get_pressed()
+        if event.type == pygame.KEYDOWN:
+            keys = pygame.key.get_pressed()
+            if game.game_over == True:
+                game.game_over = False
+                game.reset()
+            if event.key == pygame.K_a and game.game_over == False:
+                game.move_left()
+            if event.key == pygame.K_d and game.game_over == False:
+                game.move_right()
+            if event.key == keys[pygame.K_s] and game.game_over == False:
+                game.move_down()
+                game.update_score(0,1)
+            if event.key == pygame.K_w and game.game_over == False:
+                game.rotate()
+
 
         if event.type == pygame.JOYBUTTONDOWN:
             if pygame.joystick.Joystick(0).get_button(0):
